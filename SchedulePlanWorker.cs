@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace CJF.Schedules;
 
-public sealed class PlanWorker : IPlanWorker
+public sealed class SchedulePlanWorker : IPlanWorker
 {
     #region Public Events
     public event PlanWorkerEventHandler? Started;
@@ -22,23 +22,23 @@ public sealed class PlanWorker : IPlanWorker
 
     #region Private Variables
     private readonly SchedulePlanCollection _Plans;
-    private readonly IPlanerOptions _Options;
+    private readonly IScheduleWorkerOptions _Options;
     private readonly IServiceProvider _Provider;
-    private readonly ILogger<PlanWorker> _Logger;
+    private readonly ILogger<SchedulePlanWorker>? _Logger;
     private bool _IsDisposed = false;
     private Task _ExecuteTask = null!;
     #endregion
 
 
     #region Public Constructor : PlanWorker(IServiceProvider provider, IPlanerOptions options)
-    /// <summary>建立新的排程執行個體 <see cref="PlanWorker"/>。</summary>
+    /// <summary>建立新的排程執行個體 <see cref="SchedulePlanWorker"/>。</summary>
     /// <param name="provider">依賴注入(DI)的服務提供者 <see cref="IServiceProvider"/>。</param>
-    /// <param name="options">排程執行選項 <see cref="IPlanerOptions"/>。</param>
-    public PlanWorker(IServiceProvider provider, IPlanerOptions options)
+    /// <param name="options">排程執行選項 <see cref="IScheduleWorkerOptions"/>。</param>
+    public SchedulePlanWorker(IServiceProvider provider, IScheduleWorkerOptions options)
     {
         _Provider = provider;
         _Options = options;
-        _Logger = _Provider.GetRequiredService<ILogger<PlanWorker>>();
+        _Logger = _Provider.GetService<ILogger<SchedulePlanWorker>>();
         _Plans = new SchedulePlanCollection();
         BindAttributes();
     }
@@ -46,7 +46,7 @@ public sealed class PlanWorker : IPlanWorker
 
 
     #region IDsposable Support
-    ~PlanWorker() => Dispose(false);
+    ~SchedulePlanWorker() => Dispose(false);
     public void Dispose()
     {
         Dispose(true);
@@ -97,11 +97,11 @@ public sealed class PlanWorker : IPlanWorker
         await Task.WhenAny(_ExecuteTask, Task.Delay(10000, token)).ConfigureAwait(false);
         foreach (var plan in _Plans.GetPlans(PlanTypes.Stoped).Cast<SchedulePlan>())
         {
-            _Logger.LogDebug("Executing Plan : {name}", plan.Name);
+            _Logger?.LogDebug("Executing Plan : {name}", plan.Name);
             plan.ExecPlan();
         }
         Stoped?.Invoke(this);
-        _Logger.LogDebug("PlanerProcess Stoped...");
+        _Logger?.LogDebug("PlanerProcess Stoped...");
     }
     #endregion
 
@@ -109,21 +109,21 @@ public sealed class PlanWorker : IPlanWorker
     #region Internal Method : Task WorkerProcess(CancellationToken cancellationToken)
     internal async Task WorkerProcess(CancellationToken cancellationToken)
     {
-        _Logger.LogDebug("PlanerProcess Starting...");
+        _Logger?.LogDebug("PlanerProcess Starting...");
         Started?.Invoke(this);
         if (_Options.Delay > 0)
             await Task.Delay(_Options.Delay * 1000, cancellationToken).ConfigureAwait(false);
         foreach (var plan in _Plans.GetPlans(PlanTypes.Startup).Cast<SchedulePlan>())
         {
-            _Logger.LogDebug("Executing Plan : {name}", plan.Name);
+            _Logger?.LogDebug("Executing Plan : {name}", plan.Name);
             plan.ExecPlan();
         }
         while (!cancellationToken.IsCancellationRequested)
         {
-            _Logger.LogDebug("PlanerProcess Running...");
+            _Logger?.LogDebug("PlanerProcess Running...");
             foreach (var plan in _Plans.GetOnTime().Cast<SchedulePlan>())
             {
-                _Logger.LogDebug("Executing Plan : {name}", plan.Name);
+                _Logger?.LogDebug("Executing Plan : {name}", plan.Name);
                 plan.ExecPlan();
             }
                 
@@ -132,11 +132,11 @@ public sealed class PlanWorker : IPlanWorker
 
         foreach (var plan in _Plans.GetPlans(PlanTypes.Stoped).Cast<SchedulePlan>())
         {
-            _Logger.LogDebug("Executing Plan : {name}", plan.Name);
+            _Logger?.LogDebug("Executing Plan : {name}", plan.Name);
             plan.ExecPlan();
         }
         Stoped?.Invoke(this);
-        _Logger.LogDebug("PlanerProcess Stoped...");
+        _Logger?.LogDebug("PlanerProcess Stoped...");
         await Task.CompletedTask;
     }
     #endregion
@@ -164,7 +164,7 @@ public sealed class PlanWorker : IPlanWorker
                             }
                             catch (Exception ex)
                             {
-                                _Logger.LogError(ex, "{msg}", ex.Message);
+                                _Logger?.LogError(ex, "{msg}", ex.Message);
                             }
                         }
     }
@@ -173,17 +173,17 @@ public sealed class PlanWorker : IPlanWorker
     #region Plan Event Handler
     private void OnPlanStarted(ISchedulePlan item)
     {
-        _Logger.LogDebug("Plan Started : {name}", item.Name);
+        _Logger?.LogDebug("Plan Started : {name}", item.Name);
         PlanStarted?.Invoke(item);
     }
     private void OnPlanFinished(ISchedulePlan item)
     {
-        _Logger.LogDebug("Plan Finished : {name}", item.Name);
+        _Logger?.LogDebug("Plan Finished : {name}", item.Name);
         PlanFinished?.Invoke(item);
     }
     private void OnPlanFailed(ISchedulePlan item, ExceptionEventArgs e)
     {
-        _Logger.LogWarning("Plan Failed : {name}", item.Name);
+        _Logger?.LogWarning("Plan Failed : {name}", item.Name);
         PlanFailed?.Invoke(item, e);
     }
     #endregion
