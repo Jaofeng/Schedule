@@ -1,4 +1,4 @@
-﻿# 排程工作器(Schedule Plan Worker)
+# 排程工作器(Schedule Plan Worker)
 [![NuGet version](https://badge.fury.io/nu/CJF.Schedule.svg)](https://badge.fury.io/nu/CJF.Schedule)
 
 
