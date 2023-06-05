@@ -8,16 +8,21 @@
 		<AssemblyName>Schedules</AssemblyName>
 		<Configurations>MinRelease;Debug;Release</Configurations>
 		<Authors>Chen Jaofeng</Authors>
-		<AssemblyVersion>1.30.700</AssemblyVersion>
-		<FileVersion>1.30.700</FileVersion>
+		<AssemblyVersion>1.12.235</AssemblyVersion>
+		<FileVersion>1.12.235</FileVersion>
 		<Title>Schedule Plan Worker for Console Hosting Application</Title>
 		<Copyright>Copyright(c) 2023 Chen Jaofeng all right reserved.</Copyright>
 		<PackageTags>Schedule;CycleRunner;Console</PackageTags>
 		<ApplicationIcon>Images\schedule.ico</ApplicationIcon>
 		<PackageIcon>schedule.png</PackageIcon>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
-		<Description>Schedule Plan Worker for Console Hosting Application</Description>
-		<Version>1.30.700</Version>
+		<Description>Schedule Plan Worker</Description>
+		<Version>1.12.235</Version>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryUrl>https://github.com/Jaofeng/Schedule.git</RepositoryUrl>
+		<RepositoryType></RepositoryType>
+		<PackageProjectUrl>https://github.com/Jaofeng/Schedule</PackageProjectUrl>
+		<PackageReleaseNotes>首次發布</PackageReleaseNotes>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinRelease|AnyCPU'">
 		<Optimize>True</Optimize>
@@ -37,7 +42,8 @@
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	</PropertyGroup>
 	<ItemGroup>
-	  <None Remove="Images\schedule.png" />
+	  <None Remove=".gitattributes" />
+	  <None Remove=".gitignore" />
 	</ItemGroup>
 	<ItemGroup>
 	  <EmbeddedResource Include="Images\schedule.ico" />
