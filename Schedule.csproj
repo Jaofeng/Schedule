@@ -10,7 +10,7 @@
 		<Authors>Chen Jaofeng</Authors>
 		<AssemblyVersion>1.12.235</AssemblyVersion>
 		<FileVersion>1.12.235</FileVersion>
-		<Title>Schedule Plan Worker for Console Hosting Application</Title>
+		<Title>Schedule Plan Worker</Title>
 		<Copyright>Copyright(c) 2023 Chen Jaofeng all right reserved.</Copyright>
 		<PackageTags>Schedule;CycleRunner;Console</PackageTags>
 		<ApplicationIcon>Images\schedule.ico</ApplicationIcon>
@@ -23,6 +23,7 @@
 		<RepositoryType></RepositoryType>
 		<PackageProjectUrl>https://github.com/Jaofeng/Schedule</PackageProjectUrl>
 		<PackageReleaseNotes>首次發布</PackageReleaseNotes>
+		<PackageId>CJF.Schedule</PackageId>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinRelease|AnyCPU'">
 		<Optimize>True</Optimize>
