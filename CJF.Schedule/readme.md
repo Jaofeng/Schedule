@@ -361,7 +361,6 @@ planWorker.AppendPlan(new SchedulePlan(
 
 - [GitHub Repository](https://github.com/Jaofeng/Schedule)
 - [NuGet Package](https://www.nuget.org/packages/CJF.Schedule/)
-- [Release Notes](https://github.com/Jaofeng/Schedule/releases)
 
 ---
 
