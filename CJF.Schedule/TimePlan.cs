@@ -429,6 +429,67 @@ public sealed class TimePlan : IPlanTime
     }
     #endregion
 
+    /// <summary>判斷當前排程是否與指定的排程相等。</summary>
+    /// <param name="other">要比較的排程。</param>
+    public bool Equals(IPlanTime? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        if (PlanType != other.PlanType) return false;
+        if (StartFrom != other.StartFrom) return false;
+        if (StopEnd != other.StopEnd) return false;
+        if (Period != other.Period) return false;
+        if (WeekDay != other.WeekDay) return false;
+        if (Month != other.Month) return false;
+        if (Day != other.Day) return false;
+        if (WeekNo != other.WeekNo) return false;
+        if (LastExecuted != other.LastExecuted) return false;
+        if (NextTime != other.NextTime) return false;
+        return true;
+    }
+
+    /// <summary>判斷當前排程是否與指定的物件相等。</summary>
+    /// <param name="obj">要比較的物件。</param>
+    /// <returns>如果指定的物件與當前排程相等，則為 <see langword="true"/>，否則為 <see langword="false"/>。</returns>
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj is not IPlanTime other) return false;
+        return Equals(other);
+    }
+    /// <summary>取得當前排程的哈希碼。</summary>
+    /// <returns>當前排程的哈希碼。</returns>
+    public override int GetHashCode() => base.GetHashCode();
+
+    /// <summary>判斷兩個 <see cref="TimePlan"/> 物件是否相等。</summary>
+    public static bool operator ==(TimePlan? left, TimePlan? right)
+    {
+        if (left is null) return right is null;
+        if (right is null) return false;
+        return left.Equals(right);
+    }
+    /// <summary>判斷兩個 <see cref="TimePlan"/> 物件是否不相等。</summary>
+    public static bool operator !=(TimePlan? left, TimePlan? right) => !(left == right);
+    /// <summary>判斷左側的 <see cref="TimePlan"/> 是否在右側之前。</summary>
+    public static bool operator >(TimePlan? left, TimePlan? right)
+    {
+        if (left is null) return false;
+        if (right is null) return true;
+        return left.NextTime > right.NextTime;
+    }
+    /// <summary>判斷左側的 <see cref="TimePlan"/> 是否在右側之後。</summary>
+    public static bool operator <(TimePlan? left, TimePlan? right)
+    {
+        if (left is null) return true;
+        if (right is null) return false;
+        return left.NextTime < right.NextTime;
+    }
+    /// <summary>判斷左側的 <see cref="TimePlan"/> 是否在或等於右側。</summary>
+    public static bool operator >=(TimePlan? left, TimePlan? right) => !(left < right);
+    /// <summary>判斷左側的 <see cref="TimePlan"/> 是否在或等於右側。</summary>
+    public static bool operator <=(TimePlan? left, TimePlan? right) => !(left > right);
+
 
     #region Internal Method : DateTime GetNextTime(DateTime time)
     private DateTime GetNextTime(DateTime time)

@@ -1,7 +1,7 @@
 ﻿namespace CJF.Schedules.Interfaces;
 
 /// <summary>提供排程計畫的介面。</summary>
-public interface IPlanTime : ICloneable
+public interface IPlanTime : ICloneable, IEquatable<IPlanTime>
 {
     /// <summary>開始執行排程的時間。</summary>
     DateTime StartFrom { get; }
