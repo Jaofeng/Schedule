@@ -9,10 +9,10 @@
 		<AssemblyVersion>1.20.353</AssemblyVersion>
 		<FileVersion>1.20.353</FileVersion>
 		<Version>1.20.353</Version>
-		<Title>Schedule Plan Worker</Title>
+		<Title>排程工作器(Schedule Plan Worker)</Title>
 		<Copyright>Copyright(c) 2025 Chen Jaofeng all right reserved.</Copyright>
 		<PackageTags>Schedule;CycleRunner;Console</PackageTags>
-		<Description>Schedule Plan Worker</Description>
+		<Description>一個功能強大且易於使用的 .NET 8.0 排程工作器程式庫，提供完整的排程執行功能。</Description>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -22,7 +22,7 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 		<PackageReleaseNotes>
-### 1.20.353(2025-08-06)
+v1.20.353(2025-08-06)
 - 支援 .NET 8.0
 - 完整的排程類型支援
 - 強化的屬性裝飾器功能
@@ -30,7 +30,7 @@
 - 新增完整測試套件，包含94個通過測試
 - 解決反射測試問題，提供隔離測試方案
 
-### 1.12.235(2023-06-05)
+v1.12.235(2023-06-05)
 - 支援 .NET 6.0
 - 初始版本，首次發布
 		</PackageReleaseNotes>
