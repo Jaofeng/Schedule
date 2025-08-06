@@ -43,7 +43,7 @@ public sealed class SchedulePlan : ISchedulePlan
     /// <param name="name">排程名稱。</param>
     /// <param name="trigger">排程週期的時間表。</param>
     /// <param name="action">綁定執行的方法函式。</param>
-    internal SchedulePlan(string name, IPlanTime trigger, Action action)
+    public SchedulePlan(string name, IPlanTime trigger, Action action)
     {
         Name = name;
         TimeTable = trigger;
@@ -54,7 +54,7 @@ public sealed class SchedulePlan : ISchedulePlan
     /// <param name="name">排程名稱。</param>
     /// <param name="trigger">排程週期的時間表。</param>
     /// <param name="action">綁定執行的方法函式。，執行本函式時會把本 <see cref="SchedulePlan"/> 實體執行個體作為參數傳入。</param>
-    internal SchedulePlan(string name, IPlanTime trigger, Action<ISchedulePlan> action)
+    public SchedulePlan(string name, IPlanTime trigger, Action<ISchedulePlan> action)
     {
         Name = name;
         TimeTable = trigger;
