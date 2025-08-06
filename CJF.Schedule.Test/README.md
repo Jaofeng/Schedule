@@ -1,5 +1,7 @@
 # CJF.Schedule.Test - 測試專案
 
+[![NuGet version](https://badge.fury.io/nu/CJF.Schedule.svg)](https://badge.fury.io/nu/CJF.Schedule)
+
 這是 CJF.Schedule 排程工作器程式庫的測試專案，使用 xUnit 測試框架進行功能驗證。
 
 ## 專案結構
@@ -14,9 +16,7 @@ CJF.Schedule.Test/
 ├── ScheduleHostServiceExtensionsTests.cs # 主機擴充方法測試
 ├── EnumsTests.cs                        # 列舉類型測試
 ├── ExceptionTests.cs                    # 自訂例外測試
-├── CJF.Schedule.Test.csproj             # 專案檔案
-├── README.md                            # 本文件
-└── 測試說明文件.md                        # 詳細測試說明
+└── CJF.Schedule.Test.csproj             # 專案檔案
 ```
 
 ## 測試類別說明
@@ -90,6 +90,13 @@ dotnet test --verbosity normal --logger "trx;LogFileName=TestResults.trx"
 dotnet test --collect:"XPlat Code Coverage"
 ```
 
+## 測試狀況
+
+- ✅ **通過測試**: 94 個
+- ⏭️ **跳過測試**: 1 個（HostBuilderExtensions 反射相關測試）
+- ❌ **失敗測試**: 0 個
+- 📊 **總測試數**: 95 個
+
 ## 測試最佳實務
 
 ### 測試結構
@@ -142,20 +149,25 @@ public void Method_Condition_ExpectedResult()
 - ✅ TimePlan 建立測試
 - ✅ SchedulePlan 封裝測試
 - ✅ 核心邏輯模擬測試
-- ✅ AutoBind 功能測試（新增）
-- ✅ 手動排程管理測試（新增）
+- ✅ AutoBind 功能測試
+- ✅ 手動排程管理測試
 
 #### 跳過的測試
 以下測試被標記為 `Skip` 以避免反射問題：
 - `ScheduleHostServiceExtensionsTests.PlanWorker_AutoBind_BehaviorTest(autoBind: true)`: UseSchedulePlaner 相關的服務註冊測試（因為需要實際建構 PlanWorker）
 
-#### 移除的測試類別
-由於反射問題導致幾乎所有測試都需要跳過，以下測試類別已被移除/更新並由更好的替代方案取代：
-- `PlanWorkerTests`: PlanWorker 相關測試已由 `PlanAttributeReflectionTests.cs` 提供更全面的測試覆蓋
-- `HostBuilderExtensionsTests`: 更名為 `ScheduleHostServiceExtensionsTests.cs` 以反映類別的重新組織
-- PlanWorkerOptions 的測試已獨立為 `PlanWorkerOptionsTests.cs` 並新增 AutoBind 屬性測試
+#### 測試策略改進
+為了提高測試穩定性和覆蓋率，採用了以下策略：
+- **移除問題測試**: 移除幾乎全部跳過的 PlanWorkerTests.cs，保留 PlanWorkerOptions 測試
+- **隔離反射測試**: 創建 `PlanAttributeReflectionTests.cs` 獨立測試反射功能
+- **核心邏輯覆蓋**: 確保 BindAttributes 的所有關鍵功能都有相應的測試
+- **測試簡化**: 只保留必要的跳過測試，提高測試套件的整潔度
 
-這種策略確保了 BindAttributes 功能的完整測試覆蓋，同時避免了測試環境的技術限制。
+這種策略確保了：
+- 🔍 **完整的功能驗證** - 所有核心功能都有測試覆蓋
+- 🛡️ **測試環境穩定** - 避免反射掃描導致的測試失敗
+- 📈 **高測試覆蓋率** - 通過替代方式測試無法直接測試的功能
+- 🧩 **測試簡潔性** - 移除不必要的跳過測試，保持測試套件的整潔
 
 ### 測試資料
 - 使用固定日期 (2023-01-01) 以確保測試結果的一致性
@@ -176,6 +188,13 @@ public void Method_Condition_ExpectedResult()
 - 隔離問題測試到單獨的測試檔案
 - 使用 `[Fact(Skip = "reason")]` 跳過有問題的測試
 - 創建替代的隔離測試來驗證核心功能
+
+## 相關連結
+
+- [主要專案 README](../readme.md) - 完整的使用指南和 API 文件
+- [GitHub Repository](https://github.com/Jaofeng/Schedule) - 專案原始碼
+- [NuGet Package](https://www.nuget.org/packages/CJF.Schedule/) - 套件下載
+- [Release Notes](https://github.com/Jaofeng/Schedule/releases) - 版本更新記錄
 
 ## 持續改進
 
