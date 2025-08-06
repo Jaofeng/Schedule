@@ -1,4 +1,4 @@
-# CJF.Schedule - 排程工作器 (Scheduler Worker)
+# CJF.Schedule - 排程工作器 (Schedule Plan Worker)
 
 [![NuGet version](https://badge.fury.io/nu/CJF.Schedule.svg)](https://badge.fury.io/nu/CJF.Schedule)
 
@@ -345,7 +345,7 @@ planWorker.AppendPlan(new SchedulePlan(
 
 ## 更新日誌
 
-### 1.20.353
+### 1.20.353(2025-08-06)
 - 支援 .NET 8.0
 - 完整的排程類型支援
 - 強化的屬性裝飾器功能
@@ -353,7 +353,8 @@ planWorker.AppendPlan(new SchedulePlan(
 - 新增完整測試套件，包含94個通過測試
 - 解決反射測試問題，提供隔離測試方案
 
-### 1.12.235
+### 1.12.235(2023-06-05)
+- 支援 .NET 6.0
 - 初始版本，首次發布
 
 ## 相關連結
