@@ -208,8 +208,6 @@ public class SchedulePlanTests
         var time3 = new TimePlan(new DateTime(2022, 1, 1, 2, 0, 0));
         var time4 = new TimePlan(new DateTime(2024, 1, 1, 2, 0, 0));
 
-        Console.WriteLine($"time1 nexttime: {time1.NextTime}, time3 nexttime: {time3.NextTime}");
-
         // Act & Assert
         Assert.True(time1 == time2);
         Assert.False(time1 != time2);
