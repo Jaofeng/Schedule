@@ -462,32 +462,40 @@ public sealed class TimePlan : IPlanTime
     /// <returns>當前排程的哈希碼。</returns>
     public override int GetHashCode() => base.GetHashCode();
 
-    /// <summary>判斷兩個 <see cref="TimePlan"/> 物件是否相等。</summary>
+    /// <summary>判斷兩個 <see cref="TimePlan"/> 物件的下次執行時間是否相等。</summary>
+    /// <remarks>此方法會比較兩個 <see cref="TimePlan"/> 物件的 <see cref="NextTime"/> 屬性。</remarks>
+    /// <remarks>如果要比較兩個物件的屬性值是否相同，請使用 <see cref="Equals(IPlanTime?)"/> 方法。</remarks>
     public static bool operator ==(TimePlan? left, TimePlan? right)
     {
         if (left is null) return right is null;
         if (right is null) return false;
         return left.Equals(right);
     }
-    /// <summary>判斷兩個 <see cref="TimePlan"/> 物件是否不相等。</summary>
+    /// <summary>判斷兩個 <see cref="TimePlan"/> 物件的下次執行時間是否不相等。</summary>
+    /// <remarks>此方法會比較兩個 <see cref="TimePlan"/> 物件的 <see cref="NextTime"/> 屬性。</remarks>
+    /// <remarks>如果要比較兩個物件的屬性值是否相同，請使用 <see cref="Equals(IPlanTime?)"/> 方法。</remarks>
     public static bool operator !=(TimePlan? left, TimePlan? right) => !(left == right);
-    /// <summary>判斷左側的 <see cref="TimePlan"/> 是否在右側之前。</summary>
+    /// <summary>判斷左側的 <see cref="TimePlan"/> 的下次執行時間是否大於右側。</summary>
+    /// <remarks>此方法會比較兩個 <see cref="TimePlan"/> 物件的 <see cref="NextTime"/> 屬性。</remarks>
     public static bool operator >(TimePlan? left, TimePlan? right)
     {
         if (left is null) return false;
         if (right is null) return true;
         return left.NextTime > right.NextTime;
     }
-    /// <summary>判斷左側的 <see cref="TimePlan"/> 是否在右側之後。</summary>
+    /// <summary>判斷左側的 <see cref="TimePlan"/> 的下次執行時間是否小於在右側。</summary>
+    /// <remarks>此方法會比較兩個 <see cref="TimePlan"/> 物件的 <see cref="NextTime"/> 屬性。</remarks>
     public static bool operator <(TimePlan? left, TimePlan? right)
     {
         if (left is null) return true;
         if (right is null) return false;
         return left.NextTime < right.NextTime;
     }
-    /// <summary>判斷左側的 <see cref="TimePlan"/> 是否在或等於右側。</summary>
+    /// <summary>判斷左側的 <see cref="TimePlan"/> 的下次執行時間是否大於或等於右側。</summary>
+    /// <remarks>此方法會比較兩個 <see cref="TimePlan"/> 物件的 <see cref="NextTime"/> 屬性。</remarks>
     public static bool operator >=(TimePlan? left, TimePlan? right) => !(left < right);
-    /// <summary>判斷左側的 <see cref="TimePlan"/> 是否在或等於右側。</summary>
+    /// <summary>判斷左側的 <see cref="TimePlan"/> 的下次執行時間是否小於或等於右側。</summary>
+    /// <remarks>此方法會比較兩個 <see cref="TimePlan"/> 物件的 <see cref="NextTime"/> 屬性。</remarks>
     public static bool operator <=(TimePlan? left, TimePlan? right) => !(left > right);
 
 
