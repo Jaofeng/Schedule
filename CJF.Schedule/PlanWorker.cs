@@ -1,5 +1,4 @@
 ﻿using CJF.Schedules.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
@@ -36,7 +35,8 @@ public sealed class PlanWorker : BackgroundService
         _Options = options;
         _Logger = logger;
         _Plans = [];
-        BindAttributes();
+        if (_Options.AutoBind)
+            BindAttributes();
     }
 
     /// <summary>開始執行排程工作器。</summary>
@@ -192,36 +192,3 @@ public sealed class PlanWorker : BackgroundService
     #endregion
 }
 
-/// <summary><see cref="PlanWorker"/> 使用的設定選項 <see cref="PlanWorkerOptions"/>。</summary>
-public sealed class PlanWorkerOptions
-{
-    /// <summary><see cref="PlanWorker"/> 開始執行後延遲執行排程項目的時間，單位秒。</summary>
-    public int Delay { get; set; } = 0;
-    /// <summary><see cref="PlanWorker"/> 排程項目檢查週期的間隔時間，單位秒。</summary>
-    public int Interval { get; set; } = 30;
-}
-
-/// <summary>擴展 <see cref="IHostBuilder"/> 以使用排程工作器服務。</summary>
-public static class ScheduleHostServiceExtensions
-{
-
-    #region Public Static Method : IHostBuilder UseSchedulePlaner(this IHostBuilder builder, Action<PlanerOptions> options)
-    /// <summary>使用 <see cref="PlanWorker"/> 服務，並使用 <see cref="Action" />&lt;<see cref="PlanWorkerOptions"/>&gt; 進行設定。</summary>
-    /// <param name="builder"><see cref="IHostBuilder"/> 執行個體。</param>
-    /// <param name="options">進行設定的 <see cref="Action" />&lt;<see cref="PlanWorkerOptions"/>&gt; 執行函示。</param>
-    /// <param name="builder"><see cref="IHostBuilder"/> 執行個體。</param>
-    public static IHostBuilder UseSchedulePlaner(this IHostBuilder builder, Action<PlanWorkerOptions>? options = null)
-    {
-        builder.ConfigureServices((context, services) =>
-        {
-            var opts = new PlanWorkerOptions();
-            options?.Invoke(opts);
-            services.AddSingleton(opts);
-            services.AddSingleton<PlanWorker>();
-            services.AddHostedService(provider => provider.GetRequiredService<PlanWorker>());
-        });
-
-        return builder;
-    }
-    #endregion
-}

@@ -1,9 +1,35 @@
 ﻿using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace CJF.Schedules;
 
+/// <summary>擴展 <see cref="IHostBuilder"/> 以使用排程工作器服務。</summary>
+public static class ScheduleHostServiceExtensions
+{
+
+    #region Public Static Method : IHostBuilder UseSchedulePlaner(this IHostBuilder builder, Action<PlanerOptions> options)
+    /// <summary>使用 <see cref="PlanWorker"/> 服務，並使用 <see cref="Action" />&lt;<see cref="PlanWorkerOptions"/>&gt; 進行設定。</summary>
+    /// <param name="builder"><see cref="IHostBuilder"/> 執行個體。</param>
+    /// <param name="options">進行設定的 <see cref="Action" />&lt;<see cref="PlanWorkerOptions"/>&gt; 執行函示。</param>
+    /// <param name="builder"><see cref="IHostBuilder"/> 執行個體。</param>
+    public static IHostBuilder UseSchedulePlaner(this IHostBuilder builder, Action<PlanWorkerOptions>? options = null)
+    {
+        builder.ConfigureServices((context, services) =>
+        {
+            var opts = new PlanWorkerOptions();
+            options?.Invoke(opts);
+            services.AddSingleton(opts);
+            services.AddSingleton<PlanWorker>();
+            services.AddHostedService(provider => provider.GetRequiredService<PlanWorker>());
+        });
+
+        return builder;
+    }
+    #endregion
+}
 
 #region Internal Static Class : DataTimeExtensions
 /// <summary>提供 <see cref="DateTime"/> 的擴充方法。</summary>
