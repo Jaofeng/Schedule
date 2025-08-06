@@ -1,17 +1,15 @@
-﻿using CJF.Schedules.Interfaces;
-
-namespace CJF.Schedules.Attributes;
+﻿
+namespace CJF.Schedules;
 
 /// <summary>定義方法綁定的排程自訂屬性類別。</summary>
-/// <remarks>
-/// 使用此自訂屬性有以下限制或預設值：
+/// <remarks>使用此自訂屬性有以下限制或預設值：
 /// <list type="number">
 /// <item>排程名稱將會使用繫結的方法名稱。</item>
 /// <item>無設定終止執行排程的時間。</item>
 /// </list>
 /// </remarks>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-public sealed class SchedulePlanAttribute : Attribute
+public sealed class PlanAttribute : Attribute
 {
     #region Public Properties
     /// <summary>排程週期的簡易表示式。</summary>
@@ -33,20 +31,20 @@ public sealed class SchedulePlanAttribute : Attribute
     #endregion
 
 
-    #region Public Constructor : SchedulePlanAttribute(string expression)
-    /// <summary>以排程週期的簡易表示式建立新的 <see cref="SchedulePlanAttribute"/>。</summary>
+    #region Public Constructor : PlanAttribute(string expression)
+    /// <summary>以排程週期的簡易表示式建立新的 <see cref="PlanAttribute"/>。</summary>
     /// <param name="expression">排程週期的簡易表示式。</param>
-    public SchedulePlanAttribute(string expression)
+    public PlanAttribute(string expression)
     {
         Expression = expression;
     }
     #endregion
 
-    #region Public Constructor : SchedulePlanAttribute(PlanTypes type)
-    /// <summary>建立新的排程週期 <see cref="SchedulePlanAttribute"/>，本建立式適用於 <see cref="IPlanWorker"/> 開始執行(<see cref="PlanTypes.Startup"/>)與結束執行(<see cref="PlanTypes.Stoped"/>)的排程。</summary>
+    #region Public Constructor : PlanAttribute(PlanTypes type)
+    /// <summary>建立新的排程週期 <see cref="PlanAttribute"/>，本建立式適用於 <see cref="PlanWorker"/> 開始執行(<see cref="PlanTypes.Startup"/>)與結束執行(<see cref="PlanTypes.Stoped"/>)的排程。</summary>
     /// <param name="type">排程類型。</param>
     /// <exception cref="ArgumentException">必須為 <see cref="PlanTypes.Startup"/> 或 <see cref="PlanTypes.Stoped"/>。</exception>
-    public SchedulePlanAttribute(PlanTypes type)
+    public PlanAttribute(PlanTypes type)
     {
         if (type != PlanTypes.Startup && type != PlanTypes.Stoped)
             throw new ArgumentException($"必須為 {nameof(PlanTypes.Startup)} 或 {nameof(PlanTypes.Stoped)}。");
@@ -54,22 +52,13 @@ public sealed class SchedulePlanAttribute : Attribute
     }
     #endregion
 
-    #region Public Constructor : SchedulePlanAttribute(PlanTypes type, string timeString) - 無意義, 2023/05/24 Remarked
-    ///// <summary>建立新的 <see cref="SchedulePlanAttribute"/> 執行個體，本建立式適用於指定時間執行一次(<see cref="PlanTypes.Once"/>)的排程。</summary>
-    //public SchedulePlanAttribute(PlanTypes type, string timeString)
-    //{
-    //    PlanType = type;
-    //    StartFrom = DateTime.Parse(timeString);
-    //}
-    #endregion
-
-    #region Public Constructor : SchedulePlanAttribute(string timeString, int period)
-    /// <summary>建立新的排程週期 <see cref="SchedulePlanAttribute"/>，本建立式適用於指定以日(<see cref="PlanTypes.Day"/>)為單位，週期執行的排程。</summary>
+    #region Public Constructor : PlanAttribute(string timeString, int period)
+    /// <summary>建立新的排程週期 <see cref="PlanAttribute"/>，本建立式適用於指定以日(<see cref="PlanTypes.Day"/>)為單位，週期執行的排程。</summary>
     /// <param name="timeString">以 HH:mm:ss 為格式的時間表示字串。
     /// <para>此參數為排程執行的時間。</para>
     /// </param>
     /// <param name="period">以日為單位的週期天數。</param>
-    public SchedulePlanAttribute(string timeString, int period)
+    public PlanAttribute(string timeString, int period)
     {
         PlanType = PlanTypes.Day;
         StartFrom = DateTime.Today + TimeSpan.Parse(timeString);
@@ -77,14 +66,12 @@ public sealed class SchedulePlanAttribute : Attribute
     }
     #endregion
 
-    #region Public Constructor : SchedulePlanAttribute(string timeString, int period, WeekDays weekDay)
-    /// <summary>建立新的排程週期 <see cref="SchedulePlanAttribute"/>，本建立式適用於指定以星期(<see cref="PlanTypes.Week"/>)為單位，週期執行的排程。</summary>
-    /// <param name="timeString">以 HH:mm:ss 為格式的時間表示字串。
-    /// <para>此參數為排程執行的時間。</para>
-    /// </param>
+    #region Public Constructor : PlanAttribute(string timeString, int period, WeekDays weekDay)
+    /// <summary>建立新的排程週期 <see cref="PlanAttribute"/>，本建立式適用於指定以星期(<see cref="PlanTypes.Week"/>)為單位，週期執行的排程。</summary>
+    /// <param name="timeString">以 HH:mm:ss 為格式的時間表示字串。此參數為排程執行的時間。</param>
     /// <param name="period">以星期為單位的週數。</param>
     /// <param name="weekDay">排程指定執行的星期名稱。</param>
-    public SchedulePlanAttribute(string timeString, int period, WeekDays weekDay)
+    public PlanAttribute(string timeString, int period, WeekDays weekDay)
     {
         PlanType = PlanTypes.Week;
         StartFrom = DateTime.Today + TimeSpan.Parse(timeString);
@@ -93,14 +80,12 @@ public sealed class SchedulePlanAttribute : Attribute
     }
     #endregion
 
-    #region Public Constructor : SchedulePlanAttribute(string timeString, Months month, Days day)
-    /// <summary>建立新的排程週期 <see cref="SchedulePlanAttribute"/>，本建立式適用於指定以月(<see cref="PlanTypes.Month"/>)為單位，週期執行的排程。</summary>
-    /// <param name="timeString">以 HH:mm:ss 為格式的時間表示字串。
-    /// <para>此參數為排程執行的時間。</para>
-    /// </param>
+    #region Public Constructor : PlanAttribute(string timeString, Months month, Days day)
+    /// <summary>建立新的排程週期 <see cref="PlanAttribute"/>，本建立式適用於指定以月(<see cref="PlanTypes.Month"/>)為單位，週期執行的排程。</summary>
+    /// <param name="timeString">以 HH:mm:ss 為格式的時間表示字串。此參數為排程執行的時間。</param>
     /// <param name="month">排程指定執行的月份。</param>
     /// <param name="day">排程指定執行的日期。</param>
-    public SchedulePlanAttribute(string timeString, Months month, Days day)
+    public PlanAttribute(string timeString, Months month, Days day)
     {
         PlanType = PlanTypes.Month;
         StartFrom = DateTime.Today + TimeSpan.Parse(timeString);
@@ -109,15 +94,13 @@ public sealed class SchedulePlanAttribute : Attribute
     }
     #endregion
 
-    #region Public Constructor : SchedulePlanAttribute(string timeString, Months month, WeekNo weekNo, WeekDays weekDay)
-    /// <summary>建立新的排程週期 <see cref="SchedulePlanAttribute"/>，本建立式適用於指定以月週(<see cref="PlanTypes.MonthWeek"/>)為單位，週期執行的排程。</summary>
-    /// <param name="timeString">以 HH:mm:ss 為格式的時間表示字串。
-    /// <para>此參數為排程執行的時間。</para>
-    /// </param>
+    #region Public Constructor : PlanAttribute(string timeString, Months month, WeekNo weekNo, WeekDays weekDay)
+    /// <summary>建立新的排程週期 <see cref="PlanAttribute"/>，本建立式適用於指定以月週(<see cref="PlanTypes.MonthWeek"/>)為單位，週期執行的排程。</summary>
+    /// <param name="timeString">以 HH:mm:ss 為格式的時間表示字串。此參數為排程執行的時間。</param>
     /// <param name="month">排程指定執行的月份。</param>
     /// <param name="weekNo">排程指定執行的周別。</param>
     /// <param name="weekDay">排程指定執行的星期名稱。</param>
-    public SchedulePlanAttribute(string timeString, Months month, WeekNo weekNo, WeekDays weekDay)
+    public PlanAttribute(string timeString, Months month, WeekNo weekNo, WeekDays weekDay)
     {
         PlanType = PlanTypes.MonthWeek;
         StartFrom = DateTime.Today + TimeSpan.Parse(timeString);

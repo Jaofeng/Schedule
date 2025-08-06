@@ -1,9 +1,8 @@
-﻿using CJF.Schedules.Attributes;
-using CJF.Schedules.Interfaces;
+﻿using CJF.Schedules.Interfaces;
 
 namespace CJF.Schedules;
 
-internal sealed class TimePlan : ITimePlan
+public sealed class TimePlan : IPlanTime
 {
     #region Public Properties
     public DateTime StartFrom { get; set; } = default;
@@ -20,7 +19,7 @@ internal sealed class TimePlan : ITimePlan
 
 
     #region Public Constructor : TimePlan(PlanTypes type)
-    /// <summary>建立新的排程週期 <see cref="TimePlan"/>，本方法適用於 <see cref="IPlanWorker"/> 開始執行與結束執行的排程。</summary>
+    /// <summary>建立新的排程週期 <see cref="TimePlan"/>，本方法適用於 <see cref="PlanWorker"/> 開始執行與結束執行的排程。</summary>
     /// <param name="type">排程類型。</param>
     /// <exception cref="ArgumentException">必須為 <see cref="PlanTypes.Startup"/> 或 <see cref="PlanTypes.Stoped"/>。</exception>
     public TimePlan(PlanTypes type)
@@ -106,10 +105,10 @@ internal sealed class TimePlan : ITimePlan
     #region Public Static Method : ITimePlan CreatePlan(string expression)
     /// <summary>以簡易表示式建立排程週期。</summary>
     /// <param name="expression">簡易表示式。</param>
-    /// <returns>建立完成的 <see cref="ITimePlan"/> 執行個體。</returns>
+    /// <returns>建立完成的 <see cref="IPlanTime"/> 執行個體。</returns>
     /// <exception cref="ArgumentException">排程表達式格式錯誤。</exception>
     /// <exception cref="FormatException">排程表達式內容欄位格式錯誤。</exception>
-    public static ITimePlan CreatePlan(string expression)
+    public static IPlanTime CreatePlan(string expression)
     {
         var fds = expression.Split(' ');
         string[] arr;
@@ -224,7 +223,7 @@ internal sealed class TimePlan : ITimePlan
     #endregion
 
     #region Public Static Method : ITimePlan CreatePlan(SchedulePlanAttribute attr)
-    public static ITimePlan CreatePlan(SchedulePlanAttribute attr)
+    public static IPlanTime CreatePlan(PlanAttribute attr)
     {
         var pt = attr.PlanType;
         TimePlan tp = pt switch
@@ -242,7 +241,7 @@ internal sealed class TimePlan : ITimePlan
     #endregion
 
     #region ICloneable Support
-    public ITimePlan? Clone()
+    public IPlanTime? Clone()
     {
         TimePlan t;
         switch (PlanType)
@@ -419,6 +418,17 @@ internal sealed class TimePlan : ITimePlan
     }
     #endregion
 
+    #region Public Method : void UpdateExecuted(DateTime time)
+    /// <summary>更新排程的執行時間與下一次執行時間。</summary>
+    /// <param name="time">執行時間。</param>
+    /// <remarks>此方法會更新 <see cref="LastExecuted"/> 與 <see cref="NextTime"/> 屬性。</remarks>
+    public void UpdateExecuted(DateTime time)
+    {
+        LastExecuted = time;
+        NextTime = GetNextTime(time);
+    }
+    #endregion
+
 
     #region Internal Method : DateTime GetNextTime(DateTime time)
     private DateTime GetNextTime(DateTime time)
@@ -535,7 +545,7 @@ internal sealed class TimePlan : ITimePlan
     #endregion
 
 
-    #region Private Static Method : string GetDaysString(TriggerDays days)
+    #region Private Static Method : string GetDaysString(Days days)
     private static string GetDaysString(Days days)
     {
         if (days == Days.All || days == Days.None)
