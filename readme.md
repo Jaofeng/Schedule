@@ -6,7 +6,7 @@
 
 ## 版本資訊
 
-- **版本**: 1.21.360
+- **版本**: 1.21.365
 - **作者**: Chen Jaofeng
 - **許可證**: MIT
 - **目標框架**: .NET 8.0
@@ -84,7 +84,7 @@ dotnet add package CJF.Schedule
 ### PackageReference
 
 ```xml
-<PackageReference Include="CJF.Schedule" Version="1.21.360" />
+<PackageReference Include="CJF.Schedule" Version="1.21.365" />
 ```
 
 ## 快速開始
