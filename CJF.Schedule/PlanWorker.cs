@@ -87,6 +87,10 @@ public sealed class PlanWorker : BackgroundService
                         _Logger?.LogTrace("Executing Plan : {name}", plan.Name);
                         plan.ExecutePlan();
                     }
+                    catch (TaskCanceledException)
+                    {
+                        break;
+                    }
                     catch (OperationCanceledException)
                     {
                         break;
