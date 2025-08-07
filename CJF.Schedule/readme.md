@@ -6,7 +6,7 @@
 
 ## 版本資訊
 
-- **版本**: 1.20.353
+- **版本**: 1.21.360
 - **作者**: Chen Jaofeng
 - **許可證**: MIT
 - **目標框架**: .NET 8.0
@@ -91,15 +91,18 @@ using CJF.Schedules;
 using Microsoft.Extensions.Hosting;
 
 var host = Host.CreateDefaultBuilder(args)
-    .UseConsoleLifetime(opts => opts.SuppressStatusMessages = true)
-    // 使用預設設定
-    .UseSchedulePlaner()
-    // 或使用自訂設定
-    // .UseSchedulePlaner(opts => {
-    //     opts.Delay = 5;          // 延遲 5 秒啟動
-    //     opts.Interval = 60;      // 每 60 秒檢查一次
-    //     opts.AutoBind = false;   // 不自動綁定 PlanAttribute
-    // })
+    .ConfigureServices(services =>
+    {
+        // 使用 AddSchedulePlaner 方法註冊排程工作器服務
+        services.AddSchedulePlaner();
+        // 或使用自訂設定
+        // services.AddSchedulePlaner(opts =>
+        // {
+        //     opts.Delay = 2;      // 延遲 2 秒啟動
+        //     opts.Interval = 30;  // 每 30 秒檢查一次
+        //     opts.AutoBind = true; // 自動綁定 PlanAttribute
+        // });
+    })
     .Build();
 
 host.Run();
@@ -209,10 +212,15 @@ public sealed class PlanWorkerOptions
 #### 自訂設定範例
 ```csharp
 var host = Host.CreateDefaultBuilder(args)
-    .UseSchedulePlaner(opts => {
-        opts.Delay = 2;      // 延遲 2 秒啟動
-        opts.Interval = 30;  // 每 30 秒檢查一次
-        opts.AutoBind = false; // 不自動綁定 PlanAttribute
+    .ConfigureServices(services =>
+    {
+        // 使用 AddSchedulePlaner 方法註冊服務
+        services.AddSchedulePlaner(opts =>
+        {
+            opts.Delay = 2;      // 延遲 2 秒啟動
+            opts.Interval = 30;  // 每 30 秒檢查一次
+            opts.AutoBind = false; // 不自動綁定 PlanAttribute
+        });
     })
     .Build();
 ```
@@ -344,6 +352,10 @@ planWorker.AppendPlan(new SchedulePlan(
 - 查看測試專案的 README.md 獲取詳細的測試指南
 
 ## 更新日誌
+
+### 1.21.360(2025-08-07)
+- 新增 `AddSchedulePlaner` 方法，取代 `UseSchedulePlaner`
+- 增加 `UseSchedulePlaner` 的過時標記
 
 ### 1.20.353(2025-08-06)
 - 支援 .NET 8.0

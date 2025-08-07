@@ -13,7 +13,7 @@ CJF.Schedule.Test/
 ├── PlanWorkerOptionsTests.cs            # PlanWorkerOptions 類別測試
 ├── PlanAttributeTests.cs                # PlanAttribute 屬性測試
 ├── PlanAttributeReflectionTests.cs      # PlanAttribute 反射功能測試
-├── ScheduleHostServiceExtensionsTests.cs # 主機擴充方法測試
+├── HostServiceExtensionsTests.cs        # 主機擴充方法測試
 ├── EnumsTests.cs                        # 列舉類型測試
 ├── ExceptionTests.cs                    # 自訂例外測試
 └── CJF.Schedule.Test.csproj             # 專案檔案
@@ -50,9 +50,9 @@ CJF.Schedule.Test/
 - **目的**: 測試自訂例外類別的功能
 - **測試範圍**: KeyExistsException、ExceptionEventArgs 的建立和屬性
 
-### ScheduleHostServiceExtensionsTests.cs
-- **目的**: 測試 ScheduleHostServiceExtensions 擴充類別的功能
-- **測試範圍**: UseSchedulePlaner 擴充方法、服務註冊、選項配置、AutoBind 支援
+### HostServiceExtensionsTests.cs
+- **目的**: 測試 HostServiceExtensions 擴充類別的功能
+- **測試範圍**: AddSchedulePlaner 擴充方法、服務註冊、選項配置、AutoBind 支援
 
 ## 技術棧
 
@@ -93,7 +93,7 @@ dotnet test --collect:"XPlat Code Coverage"
 ## 測試狀況
 
 - ✅ **通過測試**: 94 個
-- ⏭️ **跳過測試**: 1 個（HostBuilderExtensions 反射相關測試）
+- ⏭️ **跳過測試**: 1 個（HostServiceExtensions 反射相關測試）
 - ❌ **失敗測試**: 0 個
 - 📊 **總測試數**: 95 個
 
@@ -154,7 +154,7 @@ public void Method_Condition_ExpectedResult()
 
 #### 跳過的測試
 以下測試被標記為 `Skip` 以避免反射問題：
-- `ScheduleHostServiceExtensionsTests.PlanWorker_AutoBind_BehaviorTest(autoBind: true)`: UseSchedulePlaner 相關的服務註冊測試（因為需要實際建構 PlanWorker）
+- `PlanAttributeReflectionTests.PlanWorker_AutoBind_BehaviorTest(autoBind: true)`: AddSchedulePlaner 相關的服務註冊測試（因為需要實際建構 PlanWorker）
 
 #### 測試策略改進
 為了提高測試穩定性和覆蓋率，採用了以下策略：
@@ -194,7 +194,6 @@ public void Method_Condition_ExpectedResult()
 - [主要專案 README](../readme.md) - 完整的使用指南和 API 文件
 - [GitHub Repository](https://github.com/Jaofeng/Schedule) - 專案原始碼
 - [NuGet Package](https://www.nuget.org/packages/CJF.Schedule/) - 套件下載
-- [Release Notes](https://github.com/Jaofeng/Schedule/releases) - 版本更新記錄
 
 ## 持續改進
 

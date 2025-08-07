@@ -7,11 +7,12 @@ using Microsoft.Extensions.Hosting;
 namespace CJF.Schedules;
 
 /// <summary>擴展 <see cref="IHostBuilder"/> 以使用排程工作器服務。</summary>
-public static class ScheduleHostServiceExtensions
+public static class HostServiceExtensions
 {
     #region Public Static Method : IHostBuilder UseSchedulePlaner(this IHostBuilder builder, Action<PlanerOptions> options)
     /// <summary>使用 <see cref="PlanWorker"/> 服務，並使用 <see cref="Action" />&lt;<see cref="PlanWorkerOptions"/>&gt; 進行設定。</summary>
     /// <param name="builder"><see cref="IHostBuilder"/> 執行個體。</param>
+    [Obsolete("建議改用 AddSchedulePlaner 方法。", false)]
     public static IHostBuilder UseSchedulePlaner(this IHostBuilder builder)
     {
         builder.ConfigureServices((context, services) =>
@@ -29,6 +30,7 @@ public static class ScheduleHostServiceExtensions
     /// <summary>使用 <see cref="PlanWorker"/> 服務，並使用 <see cref="Action" />&lt;<see cref="PlanWorkerOptions"/>&gt; 進行設定。</summary>
     /// <param name="builder"><see cref="IHostBuilder"/> 執行個體。</param>
     /// <param name="options">進行設定的 <see cref="Action" />&lt;<see cref="PlanWorkerOptions"/>&gt; 執行函示。</param>
+    [Obsolete("建議改用 AddSchedulePlaner 方法。", false)]
     public static IHostBuilder UseSchedulePlaner(this IHostBuilder builder, Action<PlanWorkerOptions> options)
     {
         builder.ConfigureServices((context, services) =>
@@ -41,6 +43,37 @@ public static class ScheduleHostServiceExtensions
         });
 
         return builder;
+    }
+    #endregion
+
+    #region Public Static Method : IServiceCollection AddSchedulePlaner(this IServiceCollection services)
+    /// <summary>將排程工作器服務添加到 <see cref="IServiceCollection"/> 中。</summary>
+    /// <param name="services"><see cref="IServiceCollection"/> 執行個體。</param>
+    /// <returns>返回 <see cref="IServiceCollection"/> 執行個體，以便進行鏈式調用。</returns>
+    /// <remarks>這個方法會添加 <see cref="PlanWorkerOptions"/> 和 <see cref="PlanWorker"/> 服務，並將 <see cref="PlanWorker"/> 註冊為一個託管服務。</remarks>
+    public static IServiceCollection AddSchedulePlaner(this IServiceCollection services)
+    {
+        services.AddSingleton<PlanWorkerOptions>();
+        services.AddSingleton<PlanWorker>();
+        services.AddHostedService(provider => provider.GetRequiredService<PlanWorker>());
+        return services;
+    }
+    #endregion
+
+    #region Public Static Method : IServiceCollection AddSchedulePlaner(this IServiceCollection services, Action<PlanWorkerOptions> options)
+    /// <summary>將排程工作器服務添加到 <see cref="IServiceCollection"/> 中，並使用指定的選項進行配置。</summary>
+    /// <param name="services"><see cref="IServiceCollection"/> 執行個體。</param>
+    /// <param name="options">一個 <see cref="Action"/>&lt;<see cref="PlanWorkerOptions"/>&gt; 委託，用於配置排程工作器的選項。</param>
+    /// <returns>返回 <see cref="IServiceCollection"/> 執行個體，以便進行鏈式調用。</returns>
+    /// <remarks>這個方法會創建一個新的 <see cref="PlanWorkerOptions"/> 實例，並將其添加到服務集合中。然後，它會添加 <see cref="PlanWorker"/> 服務，並將 <see cref="PlanWorker"/> 註冊為一個託管服務。</remarks>
+    public static IServiceCollection AddSchedulePlaner(this IServiceCollection services, Action<PlanWorkerOptions> options)
+    {
+        var opts = new PlanWorkerOptions();
+        options.Invoke(opts);
+        services.AddSingleton(opts);
+        services.AddSingleton<PlanWorker>();
+        services.AddHostedService(provider => provider.GetRequiredService<PlanWorker>());
+        return services;
     }
     #endregion
 }

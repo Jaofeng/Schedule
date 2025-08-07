@@ -5,47 +5,61 @@ using Xunit;
 namespace CJF.Schedules.Tests;
 
 /// <summary>
-/// 測試 ScheduleHostServiceExtensions 擴充方法
+/// 測試 HostServiceExtensionsTests 擴充方法
 /// </summary>
-public class ScheduleHostServiceExtensionsTests
+public class HostServiceExtensionsTests
 {
     /// <summary>
-    /// 測試 UseSchedulePlaner 擴充方法傳回相同的 HostBuilder 實例
+    /// 測試 AddSchedulePlaner 擴充方法傳回相同的 HostBuilder 實例
     /// 驗證擴充方法遵循流暢 API 設計，支援方法鏈式呼叫
     /// </summary>
     [Fact]
-    public void UseSchedulePlaner_ShouldReturnSameHostBuilder()
+    public void AddSchedulePlaner_ShouldReturnSameHostBuilder()
     {
         // Arrange
-        var hostBuilder = Host.CreateDefaultBuilder();
+        var hostBuilder = Host.CreateDefaultBuilder()
+            .ConfigureServices(services =>
+            {
+                // 使用 AddSchedulePlaner 方法註冊服務
+                services.AddSchedulePlaner(opts =>
+                {
+                    opts.AutoBind = false; // 強制設定 AutoBind 為 false 以避免反射掃描問題
+                });
+            });
 
         // Act
-        var result = hostBuilder.UseSchedulePlaner();
+        var result = hostBuilder;
 
         // Assert
         Assert.Same(hostBuilder, result);
     }
 
     /// <summary>
-    /// 測試不使用自訂選項的 UseSchedulePlaner 擴充方法
+    /// 測試不使用自訂選項的 AddSchedulePlaner 擴充方法
     /// 驗證能正確註冊排程相關的服務並使用預設選項
     /// 由於 PlanWorker 建構時的反射掃描在測試環境中會導致 TypeLoadException，所以將 AutoBind 設定為 false 以避免問題
     /// </summary>
     [Fact]
-    public void UseSchedulePlaner_WithoutOptions_ShouldRegisterServices()
+    public void AddSchedulePlaner_WithoutOptions_ShouldRegisterServices()
     {
         // Arrange
-        var hostBuilder = Host.CreateDefaultBuilder();
+        var hostBuilder = Host.CreateDefaultBuilder()
+            .ConfigureServices(services =>
+            {
+                // 使用 AddSchedulePlaner 方法註冊服務
+                services.AddSchedulePlaner(opts =>
+                {
+                    opts.AutoBind = false; // 強制設定 AutoBind 為 false 以避免反射掃描問題
+                });
+            });
 
         // Act
-        hostBuilder.UseSchedulePlaner();
         var host = hostBuilder.Build();
 
         // Assert
         using (host)
         {
             var planWorkerOptions = host.Services.GetService<PlanWorkerOptions>() ?? new PlanWorkerOptions();
-            planWorkerOptions.AutoBind = false; // 強制設定 AutoBind 為 false 以避免反射掃描問題
             var planWorker = host.Services.GetService<PlanWorker>();
 
             Assert.NotNull(planWorkerOptions);
@@ -59,26 +73,30 @@ public class ScheduleHostServiceExtensionsTests
     }
 
     /// <summary>
-    /// 測試使用自訂選項的 UseSchedulePlaner 擴充方法
+    /// 測試使用自訂選項的 AddSchedulePlaner 擴充方法
     /// 驗證能正確註冊服務並套用使用者提供的自訂選項
     /// 由於 PlanWorker 建構時的反射掃描在測試環境中會導致 TypeLoadException，所以將 AutoBind 設定為 false 以避免問題
     /// </summary>
     [Fact]
-    public void UseSchedulePlaner_WithOptions_ShouldConfigureServices()
+    public void AddSchedulePlaner_WithOptions_ShouldConfigureServices()
     {
         // Arrange
-        var hostBuilder = Host.CreateDefaultBuilder();
         var delay = 5;
         var interval = 60;
         var autoBind = false;
+        var hostBuilder = Host.CreateDefaultBuilder()
+            .ConfigureServices(services =>
+            {
+                // 使用 AddSchedulePlaner 方法註冊服務
+                services.AddSchedulePlaner(opts =>
+                {
+                    opts.Delay = delay;
+                    opts.Interval = interval;
+                    opts.AutoBind = autoBind; // 強制設定 AutoBind 為 false 以避免反射掃描問題
+                });
+            });
 
         // Act
-        hostBuilder.UseSchedulePlaner(opts =>
-        {
-            opts.Delay = delay;
-            opts.Interval = interval;
-            opts.AutoBind = autoBind;
-        });
         var host = hostBuilder.Build();
 
         // Assert
@@ -98,21 +116,25 @@ public class ScheduleHostServiceExtensionsTests
     }
 
     /// <summary>
-    /// 測試 UseSchedulePlaner 能正確註冊託管服務
+    /// 測試 AddSchedulePlaner 能正確註冊託管服務
     /// 驗證 PlanWorker 被正確註冊為 IHostedService 服務
     /// 由於 PlanWorker 建構時的反射掃描在測試環境中會導致 TypeLoadException，所以將 AutoBind 設定為 false 以避免問題
     /// </summary>
     [Fact]
-    public void UseSchedulePlaner_ShouldRegisterHostedService()
+    public void AddSchedulePlaner_ShouldRegisterHostedService()
     {
         // Arrange
-        var hostBuilder = Host.CreateDefaultBuilder();
+        var hostBuilder = Host.CreateDefaultBuilder()
+            .ConfigureServices(services =>
+            {
+                // 使用 AddSchedulePlaner 方法註冊服務
+                services.AddSchedulePlaner(opts =>
+                {
+                    opts.AutoBind = false; // 強制設定 AutoBind 為 false 以避免反射掃描問題
+                });
+            });
 
         // Act
-        hostBuilder.UseSchedulePlaner(opts=>
-        {
-            opts.AutoBind = false; // 強制設定 AutoBind 為 false 以避免反射掃描問題
-        });
         var host = hostBuilder.Build();
 
         // Assert
@@ -124,11 +146,11 @@ public class ScheduleHostServiceExtensionsTests
     }
 
     /// <summary>
-    /// 測試 UseSchedulePlaner 的選項配置功能
+    /// 測試 AddSchedulePlaner 的選項配置功能
     /// 驗證選項設定函式能正確修改 PlanWorkerOptions
     /// </summary>
     [Fact]
-    public void UseSchedulePlaner_OptionsConfiguration_ShouldWork()
+    public void AddSchedulePlaner_OptionsConfiguration_ShouldWork()
     {
         // Arrange
         var options = new PlanWorkerOptions();
@@ -149,11 +171,11 @@ public class ScheduleHostServiceExtensionsTests
     }
 
     /// <summary>
-    /// 測試 UseSchedulePlaner 在 null 選項時的行為
+    /// 測試 AddSchedulePlaner 在 null 選項時的行為
     /// 驗證當傳入 null 選項時，使用預設的 PlanWorkerOptions
     /// </summary>
     [Fact]
-    public void UseSchedulePlaner_WithNullOptions_ShouldUseDefaults()
+    public void AddSchedulePlaner_WithNullOptions_ShouldUseDefaults()
     {
         // Arrange
         var options = new PlanWorkerOptions();

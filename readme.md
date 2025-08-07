@@ -1,51 +1,202 @@
-# 排程工作器(Schedule Plan Worker)
+# CJF.Schedule - 排程工作器 (Schedule Plan Worker)
+
 [![NuGet version](https://badge.fury.io/nu/CJF.Schedule.svg)](https://badge.fury.io/nu/CJF.Schedule)
 
+一個功能強大且易於使用的 .NET 8.0 排程工作器程式庫，提供完整的排程執行功能。
+
+## 版本資訊
+
+- **版本**: 1.21.360
+- **作者**: Chen Jaofeng
+- **許可證**: MIT
+- **目標框架**: .NET 8.0
 
 ## 版本紀錄
 |日期|版本|說明|
 |----|----|----|
+|2025-08-07|v1.21.360|新增 `AddSchedulePlaner` 方法，取代 `UseSchedulePlaner`；增加 `UseSchedulePlaner` 的過時標記|
 |2025-08-06|v1.20.353|1. 重構專案，新增完整文件說明<br/>2. 新增測試專案，包含基本功能測試、排程項目測試、工作器測試等<br/>3. 解決反射測試問題，新增 PlanAttributeReflectionTests.cs<br/>4. 改善測試覆蓋率和穩定性|
 |2023-06-05|v1.12.235|首次發布
 
-## 技術規格
+## 功能特色
 
-- **.NET 版本**: NET 8.0
-- **套件管理**: NuGet
-- **命名空間**: `CJF.Schedules`
-- **主要依賴**: Microsoft.Extensions.Hosting (9.0.8)
-- **授權**: MIT License
+### 多種排程類型支援
 
-## 快速開始
+- ✅ **一次性執行** (`Once`) - 在指定時間執行一次
+- ✅ **每日執行** (`Day`) - 以日為單位的週期執行
+- ✅ **每週執行** (`Week`) - 以週為單位的週期執行
+- ✅ **每月執行** (`Month`) - 在指定月份和日期執行
+- ✅ **每月週執行** (`MonthWeek`) - 在指定月份的某週某日執行
+- ✅ **生命週期執行** (`Startup`/`Stoped`) - 程式啟動/停止時執行
 
-### 1. 安裝套件
+### 簡易屬性裝飾器
+
+使用 `PlanAttribute` 裝飾靜態方法，自動註冊為排程任務：
+
+```csharp
+[Plan("09:00:00", 1)]  // 每日早上9點執行
+public static void DailyTask()
+{
+    Console.WriteLine("每日任務執行");
+}
+
+[Plan("14:30:00", 1, WeekDays.Friday)]  // 每週五下午2:30執行
+public static void WeeklyReport()
+{
+    Console.WriteLine("週報產生");
+}
+
+[Plan(PlanTypes.Startup)]  // 程式啟動時執行
+public static void InitializeTask()
+{
+    Console.WriteLine("初始化任務");
+}
+```
+
+### 彈性的表達式語法
+
+支援簡易表達式格式：
+
+```
+一次性執行: "1 yyyy-MM-dd HH:mm:ss"
+每日執行:   "2 yyyy-MM-dd HH:mm:ss period"
+每週執行:   "3 yyyy-MM-dd HH:mm:ss period weekdays"
+每月執行:   "4 yyyy-MM-dd HH:mm:ss months days"
+月週執行:   "5 yyyy-MM-dd HH:mm:ss months weeknos weekdays"
+程式啟動:   "6"
+程式停止:   "7"
+```
+
+## 安裝方式
+
+### NuGet 套件管理員
+
+```bash
+Install-Package CJF.Schedule
+```
+
+### .NET CLI
+
 ```bash
 dotnet add package CJF.Schedule
 ```
 
-### 2. 基本使用
+### PackageReference
+
+```xml
+<PackageReference Include="CJF.Schedule" Version="1.21.360" />
+```
+
+## 快速開始
+
+### 1. 註冊服務
+
+在 `Program.cs` 中註冊背景服務：
+
 ```csharp
 using CJF.Schedules;
 using Microsoft.Extensions.Hosting;
 
 var host = Host.CreateDefaultBuilder(args)
-    .UseConsoleLifetime(opts => opts.SuppressStatusMessages = true)
-    // 使用預設設定
-    .UseSchedulePlaner()
-    // 或使用自訂設定
-    // .UseSchedulePlaner(opts => {
-    //     opts.Delay = 5;          // 延遲 5 秒啟動
-    //     opts.Interval = 60;      // 每 60 秒檢查一次
-    //     opts.AutoBind = false;   // 不自動綁定 PlanAttribute
-    // })
+    .ConfigureServices(services =>
+    {
+        // 使用 AddSchedulePlaner 方法註冊排程工作器服務
+        services.AddSchedulePlaner();
+        // 或使用自訂設定
+        // services.AddSchedulePlaner(opts =>
+        // {
+        //     opts.Delay = 2;      // 延遲 2 秒啟動
+        //     opts.Interval = 30;  // 每 30 秒檢查一次
+        //     opts.AutoBind = true; // 自動綁定 PlanAttribute
+        // });
+    })
     .Build();
 
 host.Run();
 ```
 
-## 配置選項
+### 2. 建立排程任務
 
-### PlanWorkerOptions
+```csharp
+using CJF.Schedules;
+
+public class ScheduledTasks
+{
+    // 每日上午8點執行
+    [Plan("08:00:00", 1)]
+    public static void MorningTask()
+    {
+        Console.WriteLine($"早晨任務執行: {DateTime.Now}");
+    }
+
+    // 每兩天下午3點執行
+    [Plan("15:00:00", 2)]
+    public static void BidailyTask()
+    {
+        Console.WriteLine($"隔日任務執行: {DateTime.Now}");
+    }
+
+    // 每週二和週四上午10點執行
+    [Plan("10:00:00", 1, WeekDays.Tuesday | WeekDays.Thursday)]
+    public static void WeeklyTask()
+    {
+        Console.WriteLine($"週期任務執行: {DateTime.Now}");
+    }
+
+    // 每月15號下午5點執行
+    [Plan("17:00:00", Months.All, Days.Day15)]
+    public static void MonthlyTask()
+    {
+        Console.WriteLine($"月度任務執行: {DateTime.Now}");
+    }
+
+    // 每月第一個週一上午9點執行
+    [Plan("09:00:00", Months.All, WeekNo.First, WeekDays.Monday)]
+    public static void MonthlyWeekTask()
+    {
+        Console.WriteLine($"月週任務執行: {DateTime.Now}");
+    }
+
+    // 程式啟動時執行
+    [Plan(PlanTypes.Startup)]
+    public static void StartupTask()
+    {
+        Console.WriteLine("程式啟動初始化完成");
+    }
+
+    // 程式停止時執行
+    [Plan(PlanTypes.Stoped)]
+    public static void ShutdownTask()
+    {
+        Console.WriteLine("程式正在關閉，執行清理作業");
+    }
+}
+```
+
+## 核心元件
+
+### PlanWorker
+主要的背景服務，繼承自 `BackgroundService`，負責：
+- 自動掃描帶有 `PlanAttribute` 的靜態方法
+- 定期檢查排程執行時間（預設30秒間隔）
+- 管理排程生命週期
+
+### PlanAttribute
+裝飾器屬性，用於標記要排程執行的靜態方法：
+- 支援多種建構函式以適應不同排程類型
+- 自動解析排程參數
+- 彈性的時間和週期設定
+
+### 排程集合管理
+- `SchedulePlan`: 代表單一排程項目
+- `PlanCollection`: 管理多個排程項目
+- `TimePlan`: 處理時間計算邏輯
+
+## 進階用法
+
+### 配置選項
+
+#### PlanWorkerOptions
 ```csharp
 public sealed class PlanWorkerOptions
 {
@@ -56,7 +207,6 @@ public sealed class PlanWorkerOptions
     public int Interval { get; set; } = 30;
 
     /// <summary>是否自動綁定具有 <see cref="PlanAttribute"/> 的靜態方法。</summary>
-    /// <remarks>如果為 <see langword="true"/>，則會在建構 <see cref="PlanWorker"/> 時自動綁定所有符合條件的方法。</remarks>
     public bool AutoBind { get; set; } = true;
 }
 ```
@@ -66,67 +216,25 @@ public sealed class PlanWorkerOptions
 - `Interval`: 每次檢查排程的間隔時間（預設：30 秒）
 - `AutoBind`: 是否自動綁定帶有 `PlanAttribute` 的靜態方法（預設：`true`）
 
-## API 參考
-
-### 擴充方法
+#### 自訂設定範例
 ```csharp
-// 使用預設設定註冊排程服務
-public static IHostBuilder UseSchedulePlaner(this IHostBuilder builder)
-
-// 使用自訂設定註冊排程服務
-public static IHostBuilder UseSchedulePlaner(this IHostBuilder builder, Action<PlanWorkerOptions> options)
+var host = Host.CreateDefaultBuilder(args)
+    .ConfigureServices(services =>
+    {
+        // 使用 AddSchedulePlaner 方法註冊服務
+        services.AddSchedulePlaner(opts =>
+        {
+            opts.Delay = 2;      // 延遲 2 秒啟動
+            opts.Interval = 30;  // 每 30 秒檢查一次
+            opts.AutoBind = false; // 不自動綁定 PlanAttribute
+        });
+    })
+    .Build();
 ```
 
-### 核心類別
-```csharp
-// 排程工作器（背景服務）
-public sealed class PlanWorker : BackgroundService
+### 排程表達式語法
 
-// 排程項目
-public sealed class SchedulePlan : ISchedulePlan
-
-// 排程屬性（用於方法裝飾）
-public sealed class PlanAttribute : Attribute
-```
-
-## 使用屬性設定排程
-
-您可以使用 `PlanAttribute` 屬性來裝飾靜態方法，系統會自動揃描並註冊這些方法為排程任務。
-
-### PlanAttribute 建構函式
-```csharp
-// 1. 使用表示式字串
-public PlanAttribute(string expression)
-
-// 2. 指定啟動/停止類型
-public PlanAttribute(PlanTypes type)  // 只支援 Startup/Stoped
-
-// 3. 日排程（每 N 天執行）
-public PlanAttribute(string timeString, int period)
-
-// 4. 週排程（每 N 週特定星期執行）
-public PlanAttribute(string timeString, int period, WeekDays weekDay)
-
-// 5. 月排程（每月特定日期執行）
-public PlanAttribute(string timeString, Months month, Days day)
-
-// 6. 月週排程（每月特定週別的特定星期執行）
-public PlanAttribute(string timeString, Months month, WeekNo weekNo, WeekDays weekDay)
-```
-
-**參數說明**:
-- `expression`: 排程表示式字串（詳細格式見下方）
-- `type`: 排程類型（僅支援 `PlanTypes.Startup` 或 `PlanTypes.Stoped`）
-- `timeString`: 時間格式 "HH:mm:ss"
-- `period`: 週期間隔（天數或週數）
-- `weekDay`: 指定的星期（可使用位元運算組合）
-- `month`: 指定的月份
-- `day`: 指定的日期
-- `weekNo`: 指定的週別
-
-### 排程表示式格式
-
-排程表示式 `expression` 使用空白區隔的欄位格式，不同排程類型有不同的欄位數量：
+排程表達式使用空白區隔的欄位格式：
 
 | 排程類型 | 格式 | 範例 |
 |----------|------|------|
@@ -138,14 +246,51 @@ public PlanAttribute(string timeString, Months month, WeekNo weekNo, WeekDays we
 | **啟動時** | `6` | `6` |
 | **停止時** | `7` | `7` |
 
-**欄位說明**:
-- `yyyy-MM-dd`: 開始日期
-- `HH:mm:ss`: 執行時間  
-- `period`: 間隔週期（天數或週數）
-- `weekdays`: 星期（1-7，多日則使用 `/` 區隔）
-- `months`: 月份（1-12 或 `A(ALL)`，多月份則使用 `/` 區隔）  
-- `days`: 日期（1-31 或 `A(ALL)`，多日期則使用 `/` 區隔）
-- `weeknos`: 週別（1-6 或 `A(ALL)`/`L(Last)`，多週別則使用 `/` 區隔）
+#### 使用表達式建立排程
+
+```csharp
+[Plan("2 2024-01-01 09:00:00 1")]  // 從2024年1月1日開始，每日上午9點執行
+public static void ExpressionBasedTask()
+{
+    Console.WriteLine("表達式排程執行");
+}
+
+[Plan("4 2025-01-01 12:00:00 A 1/15")]  // 每月1號和15號中午12點執行
+public static void BiweeklyTask()
+{
+    Console.WriteLine("每月雙週任務執行");
+}
+```
+
+### 程式化管理排程
+
+```csharp
+using CJF.Schedules;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+// 取得 PlanWorker 服務
+var planWorker = host.Services.GetRequiredService<PlanWorker>();
+
+// 動態新增排程
+planWorker.AppendPlan(new SchedulePlan(
+    "每 5 天執行", 
+    "2 2025-01-01 03:00:00 5", 
+    () => Console.WriteLine($"[Every 5 days] {DateTime.Now}")
+));
+
+planWorker.AppendPlan(new SchedulePlan(
+    "每週一三五", 
+    "3 2025-01-01 08:00:00 1 1/3/5", 
+    () => Console.WriteLine($"[Mon/Wed/Fri] {DateTime.Now}")
+));
+
+planWorker.AppendPlan(new SchedulePlan(
+    "每月最後一週的週五", 
+    new TimePlan(DateTime.Now, Months.All, WeekNo.Last, WeekDays.Friday), 
+    (plan) => Console.WriteLine($"[{plan.Name}] {DateTime.Now}")
+));
+```
 
 
 ### 排程類型列舉
@@ -299,73 +444,21 @@ public class Program
 }
 ```
 
+## 依賴項目
+
+- **Microsoft.Extensions.Hosting** (9.0.8)
+- **.NET 8.0**
+
+## 貢獻
+
+歡迎提交 Pull Request 或回報 Issues：
+- GitHub: https://github.com/Jaofeng/Schedule
+
+## 許可證
+
+本專案採用 MIT 許可證，詳見 [LICENSE](https://github.com/Jaofeng/Schedule/blob/main/LICENSE) 檔案。
+
 ## 測試和開發
-
-### 執行測試
-```bash
-# 執行所有測試
-dotnet test
-
-# 執行特定測試類別
-dotnet test --filter "FullyQualifiedName~BasicTests"
-
-# 執行反射功能測試（獨立隔離測試）
-dotnet test --filter "PlanAttributeReflectionTests"
-
-# 產生測試報告
-dotnet test --logger "trx;LogFileName=TestResults.trx"
-
-# 程式碼覆蓋率
-dotnet test --collect:"XPlat Code Coverage"
-```
-
-### 測試狀況
-- ✅ **通過測試**: 94 個
-- ⏭️ **跳過測試**: 1 個（HostBuilderExtensions 反射相關測試）
-- ❌ **失敗測試**: 0 個
-- 📊 **總測試數**: 95 個
-
-### 測試策略說明
-由於 PlanWorker 在建構時會進行反射掃描來自動綁定帶有 `PlanAttribute` 的靜態方法，這在測試環境中可能會導致 `TypeLoadException` 等問題。為了解決這個問題，我們採用了以下測試策略：
-
-1. **移除問題測試**: 移除幾乎全部跳過的 PlanWorkerTests.cs，保留 PlanWorkerOptions 測試
-2. **隔離反射測試**: 創建 `PlanAttributeReflectionTests.cs` 獨立測試反射功能
-3. **核心邏輯覆蓋**: 確保 BindAttributes 的所有關鍵功能都有相應的測試
-4. **測試簡化**: 只保留必要的跳過測試，提高測試套件的整潔度
-
-這種策略確保了：
-- 🔍 **完整的功能驗證** - 所有核心功能都有測試覆蓋
-- 🛡️ **測試環境穩定** - 避免反射掃描導致的測試失敗
-- 📈 **高測試覆蓋率** - 通過替代方式測試無法直接測試的功能
-- 🧩 **測試簡潔性** - 移除不必要的跳過測試，保持測試套件的整潔
-
-### 專案結構
-```
-Schedule/
-├── CJF.Schedule/            # 主要程式庫
-│   ├── Interfaces/          # 介面定義
-│   ├── _Enums.cs            # 列舉定義
-│   ├── _Exceptions.cs       # 例外處理
-│   ├── _Extensions.cs       # 擴充方法
-│   ├── PlanAttribute.cs     # 排程屬性
-│   ├── PlanCollection.cs    # 排程集合
-│   ├── PlanWorker.cs        # 排程工作器
-│   ├── PlanWorkerOptions.cs # 排程工作器配置選項
-│   ├── SchedulePlan.cs      # 排程項目
-│   └── TimePlan.cs          # 時間計劃
-├── CJF.Schedule.Test/       # 測試專案
-│   ├── BasicTests.cs        # 基本功能測試
-│   ├── EnumsTests.cs       # 列舉類型測試
-│   ├── ExceptionTests.cs   # 例外處理測試
-│   ├── PlanAttributeReflectionTests.cs # 反射功能測試
-│   ├── PlanAttributeTests.cs # PlanAttribute 屬性測試
-│   ├── PlanWorkerOptionsTests.cs # 配置選項測試
-│   ├── ScheduleHostServiceExtensionsTests.cs # 主機擴充方法測試
-│   ├── SchedulePlanTests.cs # 排程項目測試
-│   └── README.md           # 測試專案說明
-├── CLAUDE.md              # 開發者指南
-└── readme.md              # 這個檔案
-```
 
 ## 效能考量
 
@@ -377,32 +470,40 @@ Schedule/
 ## 注意事項
 
 ### 使用限制
-- 欲自動綁定的排程方法必須是 **靜態 (static)** 方法
+- 欲使用自動綁定的排程方法必須是 **靜態 (static)** 方法
 - 排程方法可以是 `public` 或 `private`
 - 支援兩種方法簽名：`Action` 和 `Action<ISchedulePlan>`
-- 排程表示式中的日期時間使用當地時區
+- 排程表達式中的日期時間使用當地時區
 - 程式停止時會執行所有 `PlanTypes.Stoped` 排程
-
-### 測試相關
-- **反射測試限制**: 在某些測試環境中，PlanWorker 的反射掃描可能會遇到類型載入問題
-- **測試最佳實踐**: 建議使用隔離測試來驗證反射相關功能
-- **跳過策略**: 當遇到 TypeLoadException 時，可以使用 `[Fact(Skip = "reason")]` 跳過問題測試，並創建替代的隔離測試
 
 ### 開發建議
 - 使用 `CJF.Schedule.Test` 專案作為測試參考
 - 參考 `PlanAttributeReflectionTests.cs` 了解如何測試反射功能
-- 查看 `CJF.Schedule.Test/README.md` 獲取詳細的測試指南
+- 查看測試專案的 README.md 獲取詳細的測試指南
 
-## 授權
+## 更新日誌
 
-MIT License - 詳細內容請參考 LICENSE 檔案
+### 1.21.360(2025-08-07)
+- 新增 `AddSchedulePlaner` 方法，取代 `UseSchedulePlaner`
+- 增加 `UseSchedulePlaner` 的過時標記
 
-## 貢獻
+### 1.20.353(2025-08-06)
+- 支援 .NET 8.0
+- 完整的排程類型支援
+- 強化的屬性裝飾器功能
+- 優化效能和穩定性
+- 新增完整測試套件，包含94個通過測試
+- 解決反射測試問題，提供隔離測試方案
 
-歡迎提交 Issue 和 Pull Request！
+### 1.12.235(2023-06-05)
+- 支援 .NET 6.0
+- 初始版本，首次發布
 
 ## 相關連結
 
 - [GitHub Repository](https://github.com/Jaofeng/Schedule)
 - [NuGet Package](https://www.nuget.org/packages/CJF.Schedule/)
-- [Release Notes](https://github.com/Jaofeng/Schedule/releases)
+
+---
+
+© 2025 Chen Jaofeng. All rights reserved.
