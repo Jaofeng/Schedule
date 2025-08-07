@@ -77,7 +77,7 @@ dotnet add package CJF.Schedule
 ### PackageReference
 
 ```xml
-<PackageReference Include="CJF.Schedule" Version="1.20.353" />
+<PackageReference Include="CJF.Schedule" Version="1.21.365" />
 ```
 
 ## 快速開始
