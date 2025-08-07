@@ -14,7 +14,7 @@
 ## 版本紀錄
 |日期|版本|說明|
 |----|----|----|
-|2025-08-07|v1.21.360|新增 `AddSchedulePlaner` 方法，取代 `UseSchedulePlaner`；增加 `UseSchedulePlaner` 的過時標記|
+|2025-08-07|v1.21.365|1. 新增 `AddSchedulePlaner` 方法，取代 `UseSchedulePlaner`<br/>2. 增加 `UseSchedulePlaner` 的過時標記<br/>3. 處理排程執行中的取消例外狀況|
 |2025-08-06|v1.20.353|1. 重構專案，新增完整文件說明<br/>2. 新增測試專案，包含基本功能測試、排程項目測試、工作器測試等<br/>3. 解決反射測試問題，新增 PlanAttributeReflectionTests.cs<br/>4. 改善測試覆蓋率和穩定性|
 |2023-06-05|v1.12.235|首次發布
 
@@ -483,9 +483,10 @@ public class Program
 
 ## 更新日誌
 
-### 1.21.360(2025-08-07)
+### 1.21.365(2025-08-07)
 - 新增 `AddSchedulePlaner` 方法，取代 `UseSchedulePlaner`
 - 增加 `UseSchedulePlaner` 的過時標記
+- 處理排程執行中的取消例外狀況
 
 ### 1.20.353(2025-08-06)
 - 支援 .NET 8.0

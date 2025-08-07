@@ -353,9 +353,10 @@ planWorker.AppendPlan(new SchedulePlan(
 
 ## 更新日誌
 
-### 1.21.360(2025-08-07)
+### 1.21.365(2025-08-07)
 - 新增 `AddSchedulePlaner` 方法，取代 `UseSchedulePlaner`
 - 增加 `UseSchedulePlaner` 的過時標記
+- 處理排程執行中的取消例外狀況
 
 ### 1.20.353(2025-08-06)
 - 支援 .NET 8.0
