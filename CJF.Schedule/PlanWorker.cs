@@ -87,16 +87,21 @@ public sealed class PlanWorker : BackgroundService
                         _Logger?.LogTrace("Executing Plan : {name}", plan.Name);
                         plan.ExecutePlan();
                     }
-                    catch (TaskCanceledException)
+                    catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException)
                     {
                         break;
                     }
-                    catch (OperationCanceledException)
+                    catch (Exception ex)
                     {
-                        break;
+                        _Logger?.LogError(ex, "An error occurred while executing plan {name}: {message}", plan.Name, ex.Message);
+                        OnPlanFailed(plan, new ExceptionEventArgs(ex));
                     }
                 }
                 await Task.Delay(TimeSpan.FromSeconds(_Options.Interval), stoppingToken);
+            }
+            catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException)
+            {
+                break;
             }
             catch (Exception ex)
             {
