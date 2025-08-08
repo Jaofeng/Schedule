@@ -6,9 +6,7 @@
 		<RootNamespace>CJF.Schedules</RootNamespace>
 		<AssemblyName>CJF.Schedules</AssemblyName>
 		<Authors>Chen Jaofeng</Authors>
-		<AssemblyVersion>1.21.365</AssemblyVersion>
-		<FileVersion>1.21.365</FileVersion>
-		<Version>1.21.365</Version>
+		<Version>1.21.370</Version>
 		<Title>排程工作器(Schedule Plan Worker)</Title>
 		<Copyright>Copyright(c) 2025 Chen Jaofeng all right reserved.</Copyright>
 		<PackageTags>Schedule;CycleRunner;Console</PackageTags>
@@ -22,10 +20,10 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 		<PackageReleaseNotes>
-v1.21.365(2025-08-07)
+v1.21.370(2025-08-08)
 - 新增 `AddSchedulePlaner` 方法，取代 `UseSchedulePlaner`
 - 增加 `UseSchedulePlaner` 的過時標記
-- 處理排程執行中的取消例外狀況
+- 處理排程執行中的取消例外狀況(再修正)
 
 v1.20.353(2025-08-06)
 - 支援 .NET 8.0
